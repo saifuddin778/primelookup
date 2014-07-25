@@ -26,7 +26,7 @@ class primelookup(object):
         u = 1
         for a in s:
             u *= self.v[a]
-        return (self.v[s[0]], self.v[s[int(len(s)/2)]], self.v[s[-1]], u)
+        return (self.v[s[0]]*self.v[s[1]]*self.v[s[2]], self.v[s[int(len(s)/2)]], self.v[s[-1]], u)
 
     """
     generates mappings...can be huge when large corpus is provided, but
