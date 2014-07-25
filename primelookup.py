@@ -24,8 +24,11 @@ class primelookup(object):
     """
     def score(self, s):
         u = 1
-        for a in s:
-            u *= self.v[a]
+        for i in range (0, len(s)):
+            try:
+                u *= self.v[s[i]]
+            except:
+                continue
         return (self.v[s[0]]*self.v[s[1]]*self.v[s[2]], self.v[s[int(len(s)/2)]], self.v[s[-1]], u)
 
     """
@@ -34,10 +37,12 @@ class primelookup(object):
     it can be pre-loaded before querying.
     """
     def map_primes(self):
+        #n = 0
         for i in range(0, len(self.docs)):
             _id = self.docs[i][0]
             sent_ = self.docs[i][1].split(' ')
             for j in range(0, len(sent_)):
+                sent_[j] = ''.join([e for e in sent_[j] if not e.isdigit()])
                 if len(sent_[j]) > 2:
                     score_vec = self.score(sent_[j])
                     first, middle, last, score  = score_vec
@@ -57,7 +62,8 @@ class primelookup(object):
                         self.t[first][middle] = {}
                         self.t[first][middle][last] = []
                         self.t[first][middle][last].append((_id, score))
-        return self.t
+            #n += 1
+            #print n
 
     """
     get the closest item within the given table or dict
