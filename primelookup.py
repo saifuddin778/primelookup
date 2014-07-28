@@ -2,6 +2,9 @@ from __future__ import division
 import sys
 sys.dont_write_bytecode = True
 import math
+from prime_gen import gen_4n3
+
+
 __author__ = 'Saifuddin Abdullah'
 
 """
@@ -15,7 +18,8 @@ class primelookup(object):
         #first 26 primes of the form 4n+3 
         #the point is any of these multiplied with any other(s) in any form always produces a unique
         #product..and that product only has those factors which resulted it in the given finite space.
-        self.v  = {'a': 7, 'c': 11, 'b': 19, 'e': 23, 'd': 31, 'g': 43, 'f': 47, 'i': 59, 'h': 67, 'k': 71, 'j': 79, 'm': 83, 'l': 103, 'o': 107, 'n': 127, 'q': 131, 'p': 139, 's': 151, 'r': 163, 'u': 167, 't': 179, 'w': 191, 'v': 199, 'y': 211, 'x': 223, 'z': 227}
+        #self.v  = {'a': 7, 'c': 11, 'b': 19, 'e': 23, 'd': 31, 'g': 43, 'f': 47, 'i': 59, 'h': 67, 'k': 71, 'j': 79, 'm': 83, 'l': 103, 'o': 107, 'n': 127, 'q': 131, 'p': 139, 's': 151, 'r': 163, 'u': 167, 't': 179, 'w': 191, 'v': 199, 'y': 211, 'x': 223, 'z': 227}
+        self.v = gen_4n3()
         self.t = {}
         self.docs = docs
 
@@ -25,12 +29,11 @@ class primelookup(object):
     def score(self, s):
         u = 1
         for i in range (0, len(s)):
-            try:
-                u *= self.v[s[i]]
-            except:
-                continue
+            u *= self.v[s[i]]
+        
         return (self.v[s[0]]*self.v[s[1]]*self.v[s[2]], self.v[s[int(len(s)/2)]], self.v[s[-1]], u)
 
+        
     """
     generates mappings...can be huge when large corpus is provided, but
     we can always serialize and memory map it after it is generated, so that
@@ -42,7 +45,7 @@ class primelookup(object):
             _id = self.docs[i][0]
             sent_ = self.docs[i][1].split(' ')
             for j in range(0, len(sent_)):
-                sent_[j] = ''.join([e for e in sent_[j] if not e.isdigit()])
+                sent_[j] = filter(lambda n: n in self.v, sent_[j])
                 if len(sent_[j]) > 2:
                     score_vec = self.score(sent_[j])
                     first, middle, last, score  = score_vec
@@ -89,6 +92,7 @@ class primelookup(object):
     the hash.
     """
     def search(self, word):
+        word = filter(lambda n: n in self.v, word)
         first, middle, last, score = self.score(word)
         try:
             result = self.t[first][middle][last]
